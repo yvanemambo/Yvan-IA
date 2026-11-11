@@ -15,7 +15,7 @@ Le projet Supabase associé est `rrxlyhtrdykbngtkqszq`. Il contient notamment la
 ## Configuration locale
 1. Copier `.env.example` vers `.env.local`.
 2. Renseigner l'URL Supabase et la clé publishable (ou ancienne clé anon) depuis Supabase > Project Settings > API Keys.
-3. Configurer le secret `GEMINI_API_KEY` dans Supabase > Edge Functions > Secrets. Ne jamais mettre cette clé dans `.env.local`, dans une variable `VITE_*` ou dans GitHub.
+3. Créer une clé Gemini dans [Google AI Studio](https://aistudio.google.com/app/apikey), puis ouvrir Supabase > Edge Functions > Secrets et ajouter le secret nommé exactement `GEMINI_API_KEY` avec cette clé comme valeur. Ne jamais mettre cette clé dans `.env.local`, dans une variable `VITE_*` ou dans GitHub.
 4. Déployer la fonction Edge `yvan-chat` avec `supabase functions deploy yvan-chat` après avoir lié le projet Supabase.
 5. Installer et lancer le frontend :
 
