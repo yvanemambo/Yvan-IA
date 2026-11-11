@@ -114,6 +114,9 @@ export default function App() {
       setConversations(next);
       await persist(next);
     } catch (error) {
+      // Ne pas conserver un message non envoyé dans le contexte Gemini :
+      // cela évite des messages user consécutifs lors de la prochaine tentative.
+      setConversations(conversations);
       setNotice(friendlyError(error).includes('Failed to fetch') ? 'Le service IA est indisponible. Vérifie que la fonction Gemini est déployée.' : friendlyError(error));
     } finally { setBusy(false); }
   }
