@@ -35,12 +35,15 @@ Deno.serve(async (req: Request) => {
     return json({ error: "La conversation est vide ou trop longue pour cette requête." }, 400);
   }
 
-  const contents = body.messages.map((item) => {
-    if (!item || !["user", "assistant"].includes(item.role) || typeof item.content !== "string") {
-      throw new Error("Message invalide.");
-    }
-    return { role: item.role === "assistant" ? "model" : "user", parts: [{ text: item.content.slice(0, 12000) }] };
-  });
+  const validMessages = body.messages.every((item) =>
+    item && ["user", "assistant"].includes(item.role) &&
+    typeof item.content === "string" && item.content.trim().length > 0
+  );
+  if (!validMessages) return json({ error: "Un message est invalide." }, 400);
+  const contents = body.messages.map((item) => ({
+    role: item.role === "assistant" ? "model" : "user",
+    parts: [{ text: item.content.slice(0, 12000) }],
+  }));
   if (contents[contents.length - 1].role !== "user") return json({ error: "Le dernier message doit venir de l’utilisateur." }, 400);
 
   try {
