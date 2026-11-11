@@ -1,18 +1,42 @@
 # Yvan.IA
 
-Assistant IA personnel avec une interface web responsive, authentification Supabase, conversations privées et génération de réponses via Gemini côté serveur.
+Assistant IA personnel avec une interface web responsive, des comptes Supabase, un historique privé de plusieurs conversations et des réponses Gemini exécutées côté serveur.
 
 ## Stack
-- React + Vite
-- Supabase Auth et Postgres (RLS)
+- React 19 + Vite
+- Supabase Auth pour les comptes
+- Supabase Postgres avec Row Level Security (RLS) pour l'historique
 - Supabase Edge Function pour appeler Gemini sans exposer la clé API
+- Vercel prêt pour l'hébergement du frontend
 
-## Configuration
-1. Copier `.env.example` vers `.env.local` et renseigner l'URL Supabase et la clé publishable.
-2. Configurer `GEMINI_API_KEY` comme secret de la fonction Edge `yvan-chat` dans Supabase.
-3. Déployer la fonction Edge puis lancer `npm install` et `npm run dev`.
+## Base de données déjà préparée
+Le projet Supabase associé est `rrxlyhtrdykbngtkqszq`. Il contient notamment la table `chat_history`, avec une ligne par utilisateur et un tableau JSON de conversations. Les politiques RLS SELECT/INSERT/UPDATE vérifient `auth.uid() = user_id`. Les conversations ne sont donc accessibles qu'au compte connecté propriétaire.
 
-Ne jamais placer une clé Gemini ou une clé Supabase `service_role` dans le navigateur.
+## Configuration locale
+1. Copier `.env.example` vers `.env.local`.
+2. Renseigner l'URL Supabase et la clé publishable (ou ancienne clé anon) depuis Supabase > Project Settings > API Keys.
+3. Configurer le secret `GEMINI_API_KEY` dans Supabase > Edge Functions > Secrets. Ne jamais mettre cette clé dans `.env.local`, dans une variable `VITE_*` ou dans GitHub.
+4. Déployer la fonction Edge `yvan-chat` avec `supabase functions deploy yvan-chat` après avoir lié le projet Supabase.
+5. Installer et lancer le frontend :
+
+```bash
+npm install
+npm run dev
+```
+
+## Vérifications à faire avant mise en ligne
+- Tester la création de compte, la confirmation e-mail et la connexion.
+- Tester un échange Gemini avec une clé valide.
+- Tester la création de plusieurs conversations, leur rechargement et la séparation entre deux comptes.
+- Lancer `npm run build`.
+- Configurer les variables d'environnement du frontend sur l'hébergeur.
+
+## Sécurité
+- La clé Gemini reste dans les secrets de l'Edge Function.
+- La fonction exige un JWT valide et vérifie l'utilisateur connecté.
+- L'historique est protégé par RLS au niveau de Postgres.
+- Ne jamais ajouter une clé Supabase `service_role` au frontend.
+- Aucun déploiement de production n'est effectué par ce dépôt automatiquement pour le moment.
 
 ## État
-Première base applicative en construction. L'application doit être testée avec un vrai compte avant toute mise en production.
+Première base applicative déposée. Le code n'a pas encore été exécuté dans un navigateur ni validé par un build complet.
