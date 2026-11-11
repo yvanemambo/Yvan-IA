@@ -1,0 +1,2 @@
+[functions.yvan-chat]
+verify_jwt = true
